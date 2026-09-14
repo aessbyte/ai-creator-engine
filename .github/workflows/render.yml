@@ -1,4 +1,4 @@
-name: Render Short
+name: Render Short V2
 
 on:
   workflow_dispatch:
@@ -19,19 +19,53 @@ jobs:
       - name: Create output folder
         run: mkdir -p out
 
-      - name: Render test video
+      - name: Render Scene 1
         run: |
           ffmpeg -y \
-            -f lavfi \
-            -i "color=c=black:s=1080x1920:d=6:r=30" \
+            -loop 1 -i scene01.png \
+            -vf "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,zoompan=z='min(zoom+0.0008,1.12)':d=120:s=1080x1920:fps=30" \
+            -t 4 \
             -c:v libx264 \
             -pix_fmt yuv420p \
-            -movflags +faststart \
-            out/short.mp4
+            out/scene01.mp4
+
+      - name: Render Scene 2
+        run: |
+          ffmpeg -y \
+            -loop 1 -i scene02.png \
+            -vf "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,zoompan=z='min(zoom+0.0012,1.16)':d=120:s=1080x1920:fps=30" \
+            -t 4 \
+            -c:v libx264 \
+            -pix_fmt yuv420p \
+            out/scene02.mp4
+
+      - name: Render Scene 3
+        run: |
+          ffmpeg -y \
+            -loop 1 -i scene03.png \
+            -vf "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,zoompan=z='min(zoom+0.0007,1.10)':d=120:s=1080x1920:fps=30" \
+            -t 4 \
+            -c:v libx264 \
+            -pix_fmt yuv420p \
+            out/scene03.mp4
+
+      - name: Create concat list
+        run: |
+          printf "file 'scene01.mp4'\nfile 'scene02.mp4'\nfile 'scene03.mp4'\n" > out/list.txt
+
+      - name: Join scenes
+        run: |
+          cd out
+          ffmpeg -y \
+            -f concat \
+            -safe 0 \
+            -i list.txt \
+            -c copy \
+            short.mp4
 
       - name: Upload rendered video
         uses: actions/upload-artifact@v4
         with:
-          name: short-render
+          name: short-render-v2
           path: out/short.mp4
-          retention-days: 7
+          retention-days: 7 
