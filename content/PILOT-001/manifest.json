@@ -1,0 +1,15 @@
+{
+  "id": "PILOT-001",
+  "title": "Por que o avião não cai quando o motor para?",
+  "format": "short",
+  "resolution": "1080x1920",
+  "fps": 30,
+  "voice": "andre",
+  "language": "pt",
+  "target_duration_seconds": 28,
+  "scenes": [
+    {"id": 1, "start": 0, "end": 7, "image": "scene01.png", "overlay": "O MOTOR PAROU 😳"},
+    {"id": 2, "start": 7, "end": 18, "image": "scene02.png", "overlay": "ELE AINDA VOA"},
+    {"id": 3, "start": 18, "end": 28, "image": "scene03.png", "overlay": "É UM PLANADOR GIGANTE"}
+  ]
+}
