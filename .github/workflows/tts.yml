@@ -1,0 +1,49 @@
+name: Generate Narration
+
+on:
+  workflow_dispatch:
+    inputs:
+      text:
+        description: "Text to narrate"
+        required: true
+        type: string
+      voice:
+        description: "OmniVoice speaker file name (example: narrador.wav)"
+        required: true
+        type: string
+      language:
+        description: "Language code"
+        required: true
+        default: "pt"
+        type: string
+
+jobs:
+  tts:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Generate narration
+        env:
+          OMNIVOICE_BASE_URL: ${{ secrets.OMNIVOICE_BASE_URL }}
+          OMNIVOICE_SPEAKER: ${{ inputs.voice }}
+        run: |
+          test -n "$OMNIVOICE_BASE_URL" || (echo "Missing OMNIVOICE_BASE_URL repository secret" && exit 1)
+          python -m tts.cli \
+            --text '${{ inputs.text }}' \
+            --voice '${{ inputs.voice }}' \
+            --language '${{ inputs.language }}' \
+            --output out/narration.wav
+
+      - name: Upload narration
+        uses: actions/upload-artifact@v4
+        with:
+          name: narration
+          path: out/narration.wav
+          retention-days: 7
